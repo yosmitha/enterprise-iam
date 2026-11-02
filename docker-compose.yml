@@ -1,0 +1,25 @@
+services:
+ postgres:
+  image: postgres:16-alpine
+  environment: {POSTGRES_DB: enterprise_iam, POSTGRES_USER: iam, POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}}
+  ports: ["5432:5432"]
+  volumes: [postgres_data:/var/lib/postgresql/data]
+  healthcheck: {test: ["CMD-SHELL","pg_isready -U iam -d enterprise_iam"], interval: 5s, timeout: 5s, retries: 20}
+ redis:
+  image: redis:7-alpine
+  ports: ["6379:6379"]
+ app:
+  build: .
+  depends_on:
+   postgres: {condition: service_healthy}
+   redis: {condition: service_started}
+  environment:
+   DB_URL: jdbc:postgresql://postgres:5432/enterprise_iam
+   DB_USERNAME: iam
+   DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+   REDIS_HOST: redis
+   JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+   ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
+   ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+  ports: ["8080:8080"]
+volumes: {postgres_data: {}}

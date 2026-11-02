@@ -1,0 +1,27 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: enterprise-iam
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/enterprise_iam}
+    username: ${DB_USERNAME:iam}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-minutes: 15
+    refresh-days: 7
+  bootstrap-admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
